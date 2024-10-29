@@ -1,0 +1,81 @@
+name: API Build
+
+on:
+  push:
+    paths:
+      - "api/rest/**"
+    branches:
+      - develop
+
+jobs:
+  build-backend:
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        node-version: [16.x]
+    env:
+      APP_NAME: ThwShop
+      PORT: 8000
+      DEFAULT_CURRENCY: USD
+      # do not use / end of this SHOP_URL
+      SHOP_URL: http://localhost:3003
+      JWT_KEY: 123456
+      #### strip api key ---->
+
+      STRIPE_API_KEY: ''
+
+      # Payment -> Paypal
+      # Values: sandbox or live -> sanbox for development and live for production
+      PAYPAL_MODE: sandbox
+
+      #PayPal Setting & API Credentials - sandbox
+      PAYPAL_SANDBOX_CLIENT_ID: ''
+      PAYPAL_SANDBOX_CLIENT_SECRET: ''
+
+      #PayPal Setting & API Credentials - live
+      PAYPAL_LIVE_CLIENT_ID: ''
+      PAYPAL_LIVE_CLIENT_SECRET: ''
+      PAYPAL_WEBHOOK_ID: ''
+      MYSQL_HOST: localhost
+      MYSQL_PORT: 3306
+      MYSQL_USER: test
+      MYSQL_PASSWORD: 123456
+      MYSQL_DATABASE: shop
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      REDIS_USER: ''
+      REDIS_PASSWORD: 123456
+      POSTMARK_API_TOKEN: 680cee68-5d5f-4c1b-9616-962f0d0c388b
+      MAIL_FROM: admin@nhat.tech
+      FORGET_PASSWORD_TEMPLATE_ID: 32253978
+      REDIS_FORGET_PASSWORD_TTL: 10
+      REDIS_DEFAULT_EXPIRED_TIME: 1
+      AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+      AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+      AWS_S3_BUCKET_NAME: thw-shop
+      AWS_REGION: us-east-1
+    steps:
+    - uses: actions/checkout@v3
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          node_modules
+        key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Run Install Dependencies
+      run: yarn
+    - name: Run Install Shared
+      run: yarn install:shared
+    - name: Run Build
+      run: yarn build:api-rest 
+    - name: Delete old server
+      continue-on-error: true
+      run: pm2 delete api-rest
+    - name: Start server
+      run: pm2 start api/rest/dist/main.js --name api-rest

@@ -1,0 +1,36 @@
+{
+  "name": "shopping-react",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "admin/*",
+    "api/*",
+    "shop"
+  ],
+  "scripts": {
+    "clean": "yarn workspaces run rimraf \"{.next,node_modules,__generated__,.cache,src/graphql/*.d.ts,src/framework/graphql/**/*.d.ts}\" && rimraf node_modules",
+    "gql-clean": "yarn workspaces run rimraf \"{__generated__,src/graphql/*.d.ts,src/framework/graphql/**/*.d.ts}\"",
+    "dev:shop-rest": "yarn workspace @thw/shop dev:rest",
+    "build:shop-rest": "yarn workspace @thw/shop build:rest",
+    "start:shop-rest": "yarn workspace @thw/shop start",
+    "dev:admin-rest": "yarn workspace @thw/admin-rest dev",
+    "dev:api-rest": "yarn workspace @thw/api-rest start:dev",
+    "build:api-rest": "yarn workspace @thw/api-rest build",
+    "start:api-rest": "yarn workspace @thw/api-rest start:prod",
+    "build:admin-rest": "yarn workspace @thw/admin-rest build",
+    "start:admin-rest": "yarn workspace @thw/admin-rest start",
+    "dev:shop-gql": "yarn workspace @thw/shop dev:gql",
+    "build:shop-gql": "yarn workspace @thw/shop build:gql",
+    "start:shop-gql": "yarn workspace @thw/shop start",
+    "dev:admin-gql": "yarn workspace @thw/admin-graphql dev",
+    "build:admin-gql": "yarn workspace @thw/admin-graphql build",
+    "start:admin-gql": "yarn workspace @thw/admin-graphql start",
+    "install:shared": "yarn workspace @thw/api-rest install:shared"
+  },
+  "devDependencies": {
+    "prettier": "2.4.0",
+    "rimraf": "3.0.2"
+  },
+  "dependencies": {}
+}
